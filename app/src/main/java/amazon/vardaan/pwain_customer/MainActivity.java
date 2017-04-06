@@ -12,13 +12,16 @@ import android.view.View;
 import android.widget.TextView;
 
 
-public class MainActivity extends AppCompatActivity{
+public class MainActivity extends AppCompatActivity {
 
     TextView textView;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        //1. Asks the user permission to use his camera.
+
         if (ContextCompat.checkSelfPermission(this,
                 Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -29,23 +32,33 @@ public class MainActivity extends AppCompatActivity{
     }
 
     @Override
-    protected void onStart(){
+    protected void onStart() {
         super.onStart();
-        if(getIntent().getExtras()!=null && getIntent().getExtras().containsKey("error")){
+        //18. If some data is being passed to this activity, it means an error string is passed here via some other
+        // activity
+        if (getIntent().getExtras() != null && getIntent().getExtras().containsKey("error")) {
             textView = (TextView) findViewById(R.id.result);
+            //19. setting the passed error message
             textView.setText(getIntent().getExtras().getString("error"));
-            Log.e("main","here");
+            Log.e("main", "here");
+            //20. Setting the error message as visible (its invisible by default)
             textView.setVisibility(View.VISIBLE);
         }
     }
 
-    public void QrScanner(View view){
-        if(textView!=null) {
-            Log.e("main","here now");
-
+    /**
+     * On click listener for SCAN button
+     *
+     * @param view
+     */
+    public void QrScanner(View view) {
+        if (textView != null) {
+            Log.e("main", "here now");
+            //2. this text view is the ERROR message. Hidden for now.
             textView.setVisibility(View.INVISIBLE);
         }
-        startActivity(new Intent(this,QRScannerActivity.class));
+        //3. starts the QR scanner
+        startActivity(new Intent(this, QRScannerActivity.class));
     }
 
 

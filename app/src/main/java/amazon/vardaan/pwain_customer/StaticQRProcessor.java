@@ -33,15 +33,21 @@ public class StaticQRProcessor extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_static_qrprocessor);
+        //7. Getting a handle on the amount field and button in activity_static_qrprocessor layout
         button = (Button) findViewById(R.id.button);
         editText = (EditText) findViewById(R.id.editText);
+        // 8. Fetching the passed params required to make a sign and encrypt call
         final HashMap<String, String> params = (HashMap) getIntent().getExtras().get("params");
+        // Listener for submit payment button
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 try {
+                    // 9. puts the users specified amount and executes merchant backend async task to get initiate
+                    // payment url
                     params.put("orderTotalAmount", editText.getText().toString());
                     Intent i = new Intent(getApplicationContext(), PaymentActivity.class);
+                    // 10. sends the initiate payment url to payment activity
                     i.putExtra("url", new MerchantBackendTask().execute(params).get());
                     startActivity(i);
                 } catch (Exception e) {
@@ -53,12 +59,15 @@ public class StaticQRProcessor extends AppCompatActivity {
 
     }
 
-    private class MerchantBackendTask extends AsyncTask<Map<String,String>, Void, String> {
+    /**
+     * Makes a sign and encrypt call, and returns the initiate payment url
+     */
+    private class MerchantBackendTask extends AsyncTask<Map<String, String>, Void, String> {
 
         private static final String LOG_TAG = "merchant server";
 
         @Override
-        protected String doInBackground(Map<String,String>... maps) {
+        protected String doInBackground(Map<String, String>... maps) {
             try {
                 Log.d(LOG_TAG, "Fetching from merchant endpoint");
                 HttpGet httpGet;

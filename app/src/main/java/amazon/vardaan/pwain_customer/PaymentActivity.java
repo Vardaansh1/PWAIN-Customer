@@ -26,7 +26,9 @@ public class PaymentActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
+        //14. This will be non null, if either the sms link redirects us here, or the custom tab redirects us here
         if (getIntent().getData() != null) {
+            // if intent contains tinyurl in data it means sms redirected us here, so we need to initiate payment
             if (getIntent().getData().getHost().equalsIgnoreCase("tinyurl.com")) {
                 try {
                     CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
@@ -35,17 +37,26 @@ public class PaymentActivity extends AppCompatActivity {
                             .setStartAnimations(this, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                             .setExitAnimations(this, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                             .build();
+                    //17. always opens custom tab and does not allow user to choose between other browser
                     customTabsIntent.intent.setPackage("com.android.chrome");
-                    customTabsIntent.launchUrl(this, Uri.parse(new LengthenUrl().execute(getIntent().getData().toString()).get()));
+                    customTabsIntent.launchUrl(this, Uri.parse(new LengthenUrl().execute(getIntent().getData()
+                            .toString()).get()));
                 } catch (Exception e) {
                     Log.wtf("errohr", "", e);
 
                 }
             } else if (!getIntent().getData().getQueryParameter("reasonCode").equalsIgnoreCase("001")) {
+                //18. if we are here it means the the custom tab redirected us here with the response code.
+                // If response code is not 001 its a failure
+                // default text is set to success in the layout so we didnt have to write an if block for that
                 TextView textView = (TextView) findViewById(R.id.textView);
                 textView.setText("PAYMENT FAILED :(");
             }
         } else {
+            // We are here means the we are still in app and were not directed here via SMS or browser/custom tab
+            //15. if we got a tiny url, in prod, we should first expand it here and validate that it is an amazon pay
+            // url. As of now, ANY tiny url is accepted. Currently, URL Lengthening is happening, validation is not.
+            // Seemed overkill for hackathon, but can be done if time permits. Its a tiny ass change
             try {
                 CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
                         .setShowTitle(true)
@@ -53,6 +64,8 @@ public class PaymentActivity extends AppCompatActivity {
                         .setStartAnimations(this, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                         .setExitAnimations(this, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
                         .build();
+                //16. always opens custom tab and does not allow user to choose between other browser
+                customTabsIntent.intent.setPackage("com.android.chrome");
                 customTabsIntent.launchUrl(this, Uri.parse(new LengthenUrl().execute(getIntent().getExtras()
                         .getString("url")).get()));
             } catch (Exception e) {
@@ -61,6 +74,9 @@ public class PaymentActivity extends AppCompatActivity {
         }
     }
 
+    /**
+     * Lengthens the tiny url
+     */
     private class LengthenUrl extends AsyncTask<String, Void, String> {
         @Override
         protected String doInBackground(String... strings) {
