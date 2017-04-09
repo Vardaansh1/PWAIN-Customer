@@ -1,16 +1,12 @@
 package amazon.vardaan.pwain_customer;
 
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.zxing.Result;
 
-import java.net.HttpURLConnection;
-import java.net.Proxy;
-import java.net.URL;
 import java.util.HashMap;
 
 import me.dm7.barcodescanner.zxing.ZXingScannerView;
@@ -84,58 +80,6 @@ public class QRScannerActivity extends AppCompatActivity implements ZXingScanner
         } catch (Exception e) {
             Log.e("exception", "error", e);
         }
-        // If you would like to resume scanning, call this method below:
-        // mScannerView.resumeCameraPreview(this);
     }
 
-    private class LengthenUrl extends AsyncTask<String, Void, String> {
-        @Override
-        protected String doInBackground(String... strings) {
-            try {
-                URL url = new URL(strings[0]);
-                // open connection
-                HttpURLConnection httpURLConnection = (HttpURLConnection) url.openConnection(Proxy.NO_PROXY);
-
-                // stop following browser redirect
-                httpURLConnection.setInstanceFollowRedirects(false);
-
-                // extract location header containing the actual destination URL
-                String expandedURL = httpURLConnection.getHeaderField("Location");
-                Log.wtf("expanded url=", expandedURL);
-
-                httpURLConnection.disconnect();
-                return expandedURL;
-            } catch (Exception e) {
-                Log.wtf("Error", "", e);
-//
-            }
-//                String shortenUrl = "http://www.daveltd.com/bin/tinylookup.cgi";
-//                shortenUrl = shortenUrl + "?url=" + strings[0];
-//                HttpGet httpGet = new HttpGet(shortenUrl);
-//                HttpClient httpclient = new DefaultHttpClient();
-//                HttpResponse response = httpclient.execute(httpGet);
-//                int status = response.getStatusLine().getStatusCode();
-//                Log.wtf("async task","making call" );
-//
-//                if (status == 200) {
-//                    Log.wtf("async task","status 200" );
-//
-//                    HttpEntity entity = response.getEntity();
-//                    String data = EntityUtils.toString(entity).trim();
-//                    Pattern pattern = Pattern.compile(".*<p>Refers to <a href=\"(.*?)\">.*");
-//                    Matcher matcher = pattern.matcher(data);
-//                    String result = matcher.group(1);
-//                    Log.wtf("regex result=", result);
-//
-//                    if (matcher.find()) {
-//                        Log.wtf("regex result=", result);
-//                    }
-//                    Log.d("response", data);
-//                    return result;
-//                }
-//            } catch (Exception e) {
-//            }
-            return null;
-        }
-    }
 }

@@ -10,14 +10,12 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpResponse;
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.util.EntityUtils;
-
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLDecoder;
 import java.util.HashMap;
@@ -59,6 +57,29 @@ public class StaticQRProcessor extends AppCompatActivity {
 
     }
 
+    String readStream(InputStream in) {
+        BufferedReader reader = null;
+        StringBuilder response = new StringBuilder();
+        try {
+            reader = new BufferedReader(new InputStreamReader(in));
+            String line;
+            while ((line = reader.readLine()) != null) {
+                response.append(line);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            if (reader != null) {
+                try {
+                    reader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return response.toString();
+    }
+
     /**
      * Makes a sign and encrypt call, and returns the initiate payment url
      */
@@ -70,19 +91,14 @@ public class StaticQRProcessor extends AppCompatActivity {
         protected String doInBackground(Map<String, String>... maps) {
             try {
                 Log.d(LOG_TAG, "Fetching from merchant endpoint");
-                HttpGet httpGet;
                 Uri uri = createUri(new URL("http://ec2-35-162-20-220.us-west-2.compute.amazonaws.com"), maps[0],
                         "/prod/signAndEncrypt.jsp");
                 Log.d("requestUri", uri.toString());
-                httpGet = new HttpGet(uri.toString());
+                HttpURLConnection urlConnection = (HttpURLConnection) new URL(uri.toString()).openConnection();
+                int responseCode = urlConnection.getResponseCode();
+                if (responseCode == HttpURLConnection.HTTP_OK) {
 
-                HttpClient httpclient = new DefaultHttpClient();
-                HttpResponse response = httpclient.execute(httpGet);
-
-                int status = response.getStatusLine().getStatusCode();
-                if (status == 200) {
-                    HttpEntity entity = response.getEntity();
-                    String data = EntityUtils.toString(entity).trim();
+                    String data = readStream(urlConnection.getInputStream()).trim();
                     Log.d("response", data);
                     Map<String, String> decodedParams = getDecodedQueryParameters(data);
                     for (String key : decodedParams.keySet()) {
@@ -100,7 +116,8 @@ public class StaticQRProcessor extends AppCompatActivity {
                 } else
 
                 {
-                    Log.d(LOG_TAG, String.format("Unable to sign payload. Received following status code: %d", status));
+                    Log.d(LOG_TAG, String.format("Unable to sign payload. Received following status code: %d",
+                            responseCode));
                 }
             } catch (
                     Exception e)

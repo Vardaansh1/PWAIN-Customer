@@ -11,7 +11,6 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ProgressBar;
 
-import java.net.URL;
 
 public class CustomerWebView extends AppCompatActivity {
 
@@ -54,7 +53,7 @@ public class CustomerWebView extends AppCompatActivity {
                         finish();
                     }
                 } catch (Exception e) {
-
+                    Log.wtf("Web view","",e);
                 }
             }
         });

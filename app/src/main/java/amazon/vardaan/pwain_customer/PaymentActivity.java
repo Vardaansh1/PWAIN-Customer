@@ -1,11 +1,8 @@
 package amazon.vardaan.pwain_customer;
 
 import android.content.Intent;
-import android.graphics.Color;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.customtabs.CustomTabsIntent;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.TextView;
@@ -59,16 +56,6 @@ public class PaymentActivity extends AppCompatActivity {
                 i.putExtra("url", new LengthenUrl().execute(getIntent().getExtras()
                         .getString("url")).get());
                 startActivity(i);
-//                CustomTabsIntent customTabsIntent = new CustomTabsIntent.Builder()
-//                        .setShowTitle(true)
-//                        .setToolbarColor(Color.parseColor("#FF9900"))
-//                        .setStartAnimations(this, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-//                        .setExitAnimations(this, android.R.anim.slide_in_left, android.R.anim.slide_out_right)
-//                        .build();
-//                //16. always opens custom tab and does not allow user to choose between other browser
-//                customTabsIntent.intent.setPackage("com.android.chrome");
-//                customTabsIntent.launchUrl(this, Uri.parse(new LengthenUrl().execute(getIntent().getExtras()
-//                        .getString("url")).get()));
             } catch (Exception e) {
                 Log.wtf("error", "", e);
             }
@@ -98,7 +85,6 @@ public class PaymentActivity extends AppCompatActivity {
                 return expandedURL;
             } catch (Exception e) {
                 Log.wtf("Error", "", e);
-//
             }
             return null;
         }
